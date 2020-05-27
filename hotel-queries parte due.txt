@@ -1,0 +1,56 @@
+Sempre utilizzando phpMyAdmin, come fatto per l’esercizio di ieri eseguire le seguenti queries:
+
+1- Come si chiamano gli ospiti che hanno fatto più di due prenotazioni?
+
+	SELECT COUNT(`ospite_id`) AS 'tot_booking', `ospite_id`, `ospiti`.`name`, `ospiti`.`lastname`
+	FROM `prenotazioni_has_ospiti`
+	INNER JOIN `ospiti`
+	ON `prenotazioni_has_ospiti`.`ospite_id` = `ospiti`.`id`
+	GROUP BY `ospite_id`
+	HAVING COUNT(`ospite_id`) > 2
+
+2- Stampare tutti gli ospiti per ogni prenotazione
+
+	SELECT COUNT(`ospite_id`)
+	FROM `prenotazioni_has_ospiti`
+	INNER JOIN `ospiti`
+	ON `prenotazioni_has_ospiti`.`ospite_id` = `ospiti`.`id`
+
+3- Stampare Nome, Cognome, Prezzo e Pagante per tutte le prenotazioni fatte a Maggio 2018
+
+	SELECT `pagamenti`.`prenotazione_id`, `pagamenti`.`pagante_id`, `pagamenti`.`price`, `pagamenti`.`status`, `paganti`.`name`, `paganti`.`lastname`, `prenotazioni`.`created_at`
+	FROM `pagamenti`
+	INNER JOIN `paganti`
+	ON `pagamenti`.`pagante_id` = `paganti`.`id`
+	INNER JOIN `prenotazioni`
+	ON `pagamenti`.`prenotazione_id` = `prenotazioni`.`id`
+	WHERE `prenotazioni`.`created_at` LIKE '2018-05-%';
+
+4- Fai la somma di tutti i prezzi delle prenotazioni per le stanze del primo piano
+
+	SELECT SUM(`pagamenti`.`price`) AS `sum`
+	FROM `pagamenti`
+	INNER JOIN `prenotazioni`
+	ON `pagamenti`.`prenotazione_id` = `prenotazioni`.`id`
+	INNER JOIN `stanze`
+	ON `prenotazioni`.`stanza_id` = `stanze`.`id`
+	WHERE `stanze`.`floor` = '1';
+
+5- Le stanze sono state tutte prenotate almeno una volta? (Visualizzare le stanze non ancora prenotate)
+
+	SELECT `stanze`.`id`, `stanze`.`room_number`
+	FROM `stanze`
+	LEFT JOIN `prenotazioni`
+	ON `stanza_id` = `stanze`.`id`  
+	WHERE `prenotazioni`.`id` IS NULL;
+
+Bonus: 
+
+1- Conta gli ospiti raggruppandoli per anno di nascita
+	SELECT COUNT(`ospiti`.`id`) AS `id_ospite`, YEAR(`ospiti`.`date_of_birth`)  AS `date_of_birth`
+	FROM `ospiti`
+	GROUP BY YEAR(`ospiti`.`date_of_birth`) ASC
+
+2- Somma i prezzi dei pagamenti raggruppandoli per status
+
+3- Quante prenotazioni ha fatto l’ospite che ha fatto più prenotazioni?
